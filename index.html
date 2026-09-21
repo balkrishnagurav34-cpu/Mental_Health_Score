@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Student Wellbeing Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+ <h1 style="text-align: center; font-size: 60px;">
+    Mental Health Signal
+</h1>
+
+<hr style="width: 60%; margin: 10px auto;">
+<main class="shell">
+
+  <!-- ============ LEFT: result panel ============ -->
+  <section class="panel" aria-labelledby="panel-title">
+    <header class="panel__head">
+      <h1 id="panel-title">How is screen life treating you?</h1>
+      <p class="panel__lede">
+        Twelve everyday details — sleep, study, scrolling — turned into one
+        wellbeing score by a model trained on student survey data.
+      </p>
+    </header>
+
+    <div class="dial" id="dial" data-state="idle">
+      <svg class="dial__svg" viewBox="0 0 320 196" role="img" aria-labelledby="dial-desc">
+        <title id="dial-desc">Predicted wellbeing score dial</title>
+        <path class="dial__track"
+              d="M 40 160 A 120 120 0 0 1 280 160" />
+        <path class="dial__fill" id="dialFill"
+              d="M 40 160 A 120 120 0 0 1 280 160" />
+        <g class="dial__ticks">
+          <text x="40"  y="184" text-anchor="start">0</text>
+          <text x="160" y="30"  text-anchor="middle">5</text>
+          <text x="280" y="184" text-anchor="end">10</text>
+        </g>
+      </svg>
+
+      <div class="dial__center">
+        <span class="dial__score" id="scoreValue">—</span>
+        <span class="dial__unit">out of 10</span>
+      </div>
+    </div>
+
+    <div class="readout" id="readout" aria-live="polite">
+      <p class="readout__idle" id="readoutIdle">
+        Fill in the form and the dial will move.
+      </p>
+
+      <div class="readout__loading" id="readoutLoading" hidden>
+        <span class="pulse"></span>
+        <span>Running the model…</span>
+      </div>
+
+      <div class="readout__result" id="readoutResult" hidden>
+        <p class="readout__band" id="scoreBand"></p>
+        <p class="readout__note" id="scoreNote"></p>
+      </div>
+
+      <div class="readout__error" id="readoutError" hidden>
+        <p class="readout__band">Nothing came back</p>
+        <p class="readout__note" id="errorNote"></p>
+      </div>
+    </div>
+
+    <p class="panel__foot">
+      A study project, not a clinical tool. If something feels heavy, talk to
+      someone you trust.
+    </p>
+  </section>
+
+  <!-- ============ RIGHT: input form ============ -->
+  <form class="form" id="predictForm" novalidate>
+
+    <fieldset class="group">
+      <legend class="group__title">About you</legend>
+
+      <div class="grid">
+        <label class="field">
+          <span class="field__label">Age</span>
+          <input type="number" name="Age" id="Age" min="10" max="100" step="1" value="21" required />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Gender</span>
+          <select name="Gender" id="Gender">
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Country</span>
+          <input list="countryList" name="Country" id="Country" value="India" autocomplete="country-name" required />
+          <datalist id="countryList">
+            <option>India</option><option>USA</option><option>Canada</option>
+            <option>Australia</option><option>UK</option><option>Germany</option>
+            <option>Mexico</option><option>Turkey</option><option>France</option>
+          </datalist>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Academic level</span>
+          <select name="Academic_Level" id="Academic_Level">
+            <option>High School</option>
+            <option selected>Undergraduate</option>
+            <option>Graduate</option>
+          </select>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="group">
+      <legend class="group__title">Screen life</legend>
+
+      <div class="grid">
+        <label class="field">
+          <span class="field__label">Most used platform</span>
+          <select name="Most_Used_Platform" id="Most_Used_Platform">
+            <option>Instagram</option><option>Facebook</option><option>LinkedIn</option>
+            <option>Snapchat</option><option>Twitter</option><option>YouTube</option>
+            <option>TikTok</option><option>LINE</option><option>KakaoTalk</option>
+            <option>VKontakte</option><option>WhatsApp</option><option>WeChat</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Mainly used for</span>
+          <select name="Purpose_Of_Use" id="Purpose_Of_Use">
+            <option>Entertainment</option><option>Networking</option>
+            <option>Education</option><option>News</option>
+          </select>
+        </label>
+
+        <label class="field field--wide">
+          <span class="field__label">
+            Daily time on social media
+            <output class="field__out" id="out_Avg_Daily_Usage_Hours">4.0 h</output>
+          </span>
+          <input type="range" name="Avg_Daily_Usage_Hours" id="Avg_Daily_Usage_Hours"
+                 min="0" max="24" step="0.5" value="4" data-unit=" h" />
+        </label>
+
+        <label class="field field--wide">
+          <span class="field__label">
+            Times you unlock your phone
+            <output class="field__out" id="out_Daily_Unlocks">80</output>
+          </span>
+          <input type="range" name="Daily_Unlocks" id="Daily_Unlocks"
+                 min="0" max="300" step="5" value="80" data-unit="" />
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="group">
+      <legend class="group__title">A typical day</legend>
+
+      <div class="grid">
+        <label class="field field--wide">
+          <span class="field__label">
+            Studying
+            <output class="field__out" id="out_Study_Hours">5.0 h</output>
+          </span>
+          <input type="range" name="Study_Hours" id="Study_Hours"
+                 min="0" max="24" step="0.5" value="5" data-unit=" h" />
+        </label>
+
+        <label class="field field--wide">
+          <span class="field__label">
+            Moving or exercising
+            <output class="field__out" id="out_Physical_Activity_Hours">1.0 h</output>
+          </span>
+          <input type="range" name="Physical_Activity_Hours" id="Physical_Activity_Hours"
+                 min="0" max="20" step="0.5" value="1" data-unit=" h" />
+        </label>
+
+        <label class="field field--wide">
+          <span class="field__label">
+            Sleeping
+            <output class="field__out" id="out_Sleep_Hours_Per_Night">7.0 h</output>
+          </span>
+          <input type="range" name="Sleep_Hours_Per_Night" id="Sleep_Hours_Per_Night"
+                 min="0" max="24" step="0.5" value="7" data-unit=" h" />
+        </label>
+
+        <div class="field field--wide">
+          <span class="field__label">How stressed do you feel lately?</span>
+          <div class="chips" id="stressChips" role="radiogroup" aria-label="Stress level">
+            <label class="chip"><input type="radio" name="Stress_Level" value="Low" /><span>Low</span></label>
+            <label class="chip"><input type="radio" name="Stress_Level" value="Medium" checked /><span>Medium</span></label>
+            <label class="chip"><input type="radio" name="Stress_Level" value="High" /><span>High</span></label>
+            <label class="chip"><input type="radio" name="Stress_Level" value="Very High" /><span>Very High</span></label>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit" class="btn" id="submitBtn">Get my score</button>
+      <button type="reset" class="btn btn--quiet" id="resetBtn">Start over</button>
+    </div>
+
+    <p class="form__status" id="formStatus" role="status"></p>
+  </form>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
