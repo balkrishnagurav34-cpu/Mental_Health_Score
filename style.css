@@ -1,0 +1,446 @@
+/* ============================================================
+   Student Wellbeing Check — styles
+   ============================================================ */
+
+:root {
+  --ink:        #12242B;
+  --ink-soft:   #4A626B;
+  --paper:      #E7EDEC;
+  --surface:    #FFFFFF;
+  --line:       #CBD7D6;
+  --sage:       #3F7F68;
+  --sage-deep:  #2C5C4B;
+  --amber:      #C58A2E;
+  --brick:      #A8453C;
+
+  --dial: var(--sage);
+
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+
+  --step-0: 1rem;
+  --step-1: 1.15rem;
+  --step-2: 1.6rem;
+  --step-3: 2.4rem;
+
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: inherit; }
+
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(90rem 50rem at 15% -10%, #F3F7F6 0%, transparent 60%),
+    var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------- layout ---------------- */
+
+.shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 3.5rem) clamp(1rem, 4vw, 2.5rem) 4rem;
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .shell { grid-template-columns: 27rem 1fr; }
+  .panel { position: sticky; top: calc(2rem + env(safe-area-inset-top, 0px)); }
+}
+
+/* ---------------- result panel ---------------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: clamp(1.4rem, 3vw, 2rem);
+  box-shadow: 0 18px 40px -32px rgba(18, 36, 43, .55);
+}
+
+.panel__head h1 {
+  font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: var(--step-3);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 .6rem;
+  max-width: 18ch;
+}
+
+.panel__lede {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: .95rem;
+  max-width: 44ch;
+}
+
+.panel__foot {
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+/* ---------------- dial ---------------- */
+
+.dial {
+  position: relative;
+  margin: 1.5rem auto .25rem;
+  max-width: 20rem;
+}
+
+.dial__svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.dial__track {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 18;
+  stroke-linecap: round;
+}
+
+.dial__fill {
+  fill: none;
+  stroke: var(--dial);
+  stroke-width: 18;
+  stroke-linecap: round;
+  stroke-dasharray: 377;
+  stroke-dashoffset: 377;
+  transition: stroke-dashoffset 1.1s cubic-bezier(.22, .9, .3, 1), stroke .6s ease;
+}
+
+.dial__ticks text {
+  fill: var(--ink-soft);
+  font-size: 12px;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.dial__center {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 12%;
+  text-align: center;
+}
+
+.dial__score {
+  display: block;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 700;
+  font-size: 3.4rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--dial);
+  font-variant-numeric: tabular-nums;
+}
+
+.dial__unit {
+  display: block;
+  font-size: .8rem;
+  color: var(--ink-soft);
+  margin-top: .25rem;
+}
+
+.dial[data-state="loading"] .dial__score { color: var(--line); }
+
+/* ---------------- readout ---------------- */
+
+.readout { min-height: 5.5rem; text-align: center; }
+
+.readout__idle,
+.readout__note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: .9rem;
+  max-width: 34ch;
+  margin-inline: auto;
+}
+
+.readout__band {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 700;
+  font-size: var(--step-1);
+  margin: 0 0 .3rem;
+  color: var(--dial);
+}
+
+.readout__result { animation: rise .5s ease both; }
+
+.readout__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  color: var(--ink-soft);
+  font-size: .9rem;
+}
+
+.pulse {
+  width: .7rem; height: .7rem;
+  border-radius: 50%;
+  background: var(--sage);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+
+.readout__error .readout__band { color: var(--brick); }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(.7); opacity: .4; }
+  50%      { transform: scale(1);  opacity: 1; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------------- form ---------------- */
+
+.form { display: grid; gap: 1.25rem; }
+
+.group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 1.25rem clamp(1rem, 2.5vw, 1.5rem) 1.5rem;
+  margin: 0;
+}
+
+.group__title {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 500;
+  font-size: var(--step-1);
+  padding: 0 .4rem;
+  margin-left: -.4rem;
+  color: var(--sage-deep);
+}
+
+.grid {
+  display: grid;
+  gap: 1.1rem 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 560px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .field--wide { grid-column: 1 / -1; }
+}
+
+.field { display: grid; gap: .45rem; }
+
+.field__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.field__out {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--sage-deep);
+  background: var(--paper);
+  border-radius: var(--r-sm);
+  padding: .05rem .45rem;
+  font-size: .85rem;
+}
+
+input[type="number"],
+input[type="text"],
+input:not([type]),
+select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: .6rem .7rem;
+  width: 100%;
+  min-width: 0;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+                    linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+  background-position: calc(100% - 1.05rem) 55%, calc(100% - .75rem) 55%;
+  background-size: .33rem .33rem, .33rem .33rem;
+  background-repeat: no-repeat;
+  padding-right: 2.2rem;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+.chip input:focus-visible + span {
+  outline: 2px solid var(--sage);
+  outline-offset: 2px;
+  border-color: var(--sage);
+}
+
+input[aria-invalid="true"] { border-color: var(--brick); }
+
+/* range */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  margin: .35rem 0;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--sage);
+  border: 3px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(18, 36, 43, .35);
+  cursor: grab;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--sage);
+  border: 3px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(18, 36, 43, .35);
+  cursor: grab;
+}
+
+input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
+
+/* chips */
+
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; }
+
+.chip span {
+  display: inline-block;
+  padding: .45rem .9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.chip input:checked + span {
+  background: var(--sage-deep);
+  border-color: var(--sage-deep);
+  color: #fff;
+}
+
+/* ---------------- actions ---------------- */
+
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--sage-deep);
+  background: var(--sage-deep);
+  color: #fff;
+  padding: .75rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .15s ease, transform .1s ease;
+}
+
+.btn:hover { background: var(--sage); }
+.btn:active { transform: translateY(1px); }
+
+.btn[disabled] { opacity: .55; cursor: progress; }
+
+.btn--quiet {
+  background: transparent;
+  color: var(--sage-deep);
+  border-color: var(--line);
+}
+.btn--quiet:hover { background: var(--surface); }
+
+.form__status {
+  margin: 0;
+  min-height: 1.2rem;
+  font-size: .88rem;
+  color: var(--brick);
+}
+
+/* ---------------- motion preference ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ---------------- dark scheme ---------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink:      #E8EFED;
+    --ink-soft: #9DB2B0;
+    --paper:    #142027;
+    --surface:  #1B2B32;
+    --line:     #2E434B;
+    --sage:     #6FB394;
+    --sage-deep:#8CCBAB;
+    --amber:    #E0AE5A;
+    --brick:    #E08A80;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink:      #E8EFED;
+  --ink-soft: #9DB2B0;
+  --paper:    #142027;
+  --surface:  #1B2B32;
+  --line:     #2E434B;
+  --sage:     #6FB394;
+  --sage-deep:#8CCBAB;
+  --amber:    #E0AE5A;
+  --brick:    #E08A80;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .chip input:checked + span { color: #11202A; }
+  :root:not([data-theme="light"]) .btn { color: #11202A; }
+}
