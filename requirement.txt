@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 fastapi
 uvicorn
 pydantic 
 joblib 
 pandas 
+=======
+fastapi
+uvicorn
+pydantic 
+joblib 
+pandas 
+>>>>>>> 6836619a6c1e38e138ba182dc8ee6f70e90285dc
 scikit-learn

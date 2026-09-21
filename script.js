@@ -1,12 +1,21 @@
+/* ============================================================
+   Student Wellbeing Check — front-end logic
+   Talks to the FastAPI backend: POST {API_BASE}/predict
+   ============================================================ */
+
+/* Change this if you start uvicorn on a different port. */
 const API_BASE = "http://127.0.0.1:8000";
 
+/* The model's target range, used only for the dial. */
 const SCORE_MIN = 0;
 const SCORE_MAX = 10;
 
-
+/* Semicircle length for r=120  ->  PI * 120 */
 const ARC_LENGTH = 377;
 
-
+/* ------------------------------------------------------------
+   Element handles
+   ------------------------------------------------------------ */
 const form          = document.getElementById("predictForm");
 const submitBtn     = document.getElementById("submitBtn");
 const resetBtn      = document.getElementById("resetBtn");
@@ -24,7 +33,7 @@ const scoreBand     = document.getElementById("scoreBand");
 const scoreNote     = document.getElementById("scoreNote");
 const errorNote     = document.getElementById("errorNote");
 
-
+/* Fields that need live number readouts next to their label. */
 const SLIDERS = [
   "Avg_Daily_Usage_Hours",
   "Daily_Unlocks",
@@ -33,7 +42,9 @@ const SLIDERS = [
   "Sleep_Hours_Per_Night"
 ];
 
-
+/* ------------------------------------------------------------
+   Live slider labels
+   ------------------------------------------------------------ */
 function syncSlider(input) {
   const out = document.getElementById("out_" + input.id);
   if (!out) return;
@@ -52,7 +63,10 @@ SLIDERS.forEach(function (id) {
   input.addEventListener("input", function () { syncSlider(input); });
 });
 
-
+/* ------------------------------------------------------------
+   Collect + validate the payload
+   Keys and types match the StudentData Pydantic model exactly.
+   ------------------------------------------------------------ */
 function buildPayload() {
   const get = (id) => document.getElementById(id).value.trim();
   const num = (id) => parseFloat(document.getElementById(id).value);
@@ -99,7 +113,9 @@ function validate(payload) {
   return null;
 }
 
-
+/* ------------------------------------------------------------
+   Panel states: idle / loading / result / error
+   ------------------------------------------------------------ */
 function setState(state) {
   dial.dataset.state = state;
 
@@ -112,7 +128,9 @@ function setState(state) {
   submitBtn.textContent = state === "loading" ? "Working…" : "Get my score";
 }
 
-
+/* ------------------------------------------------------------
+   Dial + wording for a score
+   ------------------------------------------------------------ */
 function bandFor(score) {
   if (score >= 7.5) {
     return {
@@ -180,7 +198,9 @@ function describeError(status, body) {
   return "The server replied with status " + status + ".";
 }
 
-
+/* ------------------------------------------------------------
+   Submit
+   ------------------------------------------------------------ */
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
   formStatus.textContent = "";
@@ -203,7 +223,7 @@ form.addEventListener("submit", async function (event) {
     });
 
     let body = null;
-    try { body = await response.json(); } catch (_) {  }
+    try { body = await response.json(); } catch (_) { /* non-JSON reply */ }
 
     if (!response.ok) {
       errorNote.textContent = describeError(response.status, body);
@@ -232,7 +252,9 @@ form.addEventListener("submit", async function (event) {
   }
 });
 
-
+/* ------------------------------------------------------------
+   Reset
+   ------------------------------------------------------------ */
 resetBtn.addEventListener("click", function () {
   formStatus.textContent = "";
   window.setTimeout(function () {
@@ -244,5 +266,5 @@ resetBtn.addEventListener("click", function () {
   }, 0);
 });
 
-
+/* Start clean. */
 resetDial();
