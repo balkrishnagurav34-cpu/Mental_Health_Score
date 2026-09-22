@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* Change this if you start uvicorn on a different port. */
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://mental-health-score-q6t1.onrender.com";
 
 /* The model's target range, used only for the dial. */
 const SCORE_MIN = 0;
